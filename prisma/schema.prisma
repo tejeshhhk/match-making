@@ -1,0 +1,57 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// MSME Business Profile
+model Company {
+  id             String        @id @default(cuid())
+  name           String
+  udyamNumber    String        @unique
+  category       String
+  state          String
+  turnoverCr     Float         @default(0)
+  experienceYears Int          @default(0)
+  certifications String        @default("")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  savedTenders   SavedTender[]
+}
+
+// Government Tender Information
+model Tender {
+  id              String        @id @default(cuid())
+  title           String
+  department      String
+  category        String
+  state           String
+  valueCr         Float
+  minTurnoverCr   Float
+  requiredCerts   String        @default("")
+  emdExempt       Boolean       @default(false)
+  deadline        DateTime
+  sourceUrl       String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  savedTenders    SavedTender[]
+}
+
+// Bookmarked Tenders
+model SavedTender {
+  id        String   @id @default(cuid())
+  companyId String
+  tenderId  String
+  createdAt DateTime @default(now())
+
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tender    Tender   @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, tenderId])
+}

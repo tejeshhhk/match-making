@@ -1,65 +1,105 @@
-
-export function calculateMatch(company, tender) {
-  let score = 0;
-  const reasons = [];
-  const gaps = [];
-
-  // 1. Business category — 40 points
-  if (
-    company.category?.toLowerCase() ===
-    tender.category?.toLowerCase()
-  ) {
-    score += 40;
-    reasons.push("Business category matches");
-  } else {
-    gaps.push("Business category does not match");
-  }
-
-  // 2. Annual turnover — 35 points
-  if (company.turnoverCr >= tender.minTurnoverCr) {
-    score += 35;
-    reasons.push("Turnover requirement is satisfied");
-  } else {
-    gaps.push(
-      `Required turnover: ₹${tender.minTurnoverCr} Cr`
-    );
-  }
-
-  // 3. Required certifications — 25 points
-  const required = tender.requiredCerts
+function listValues(value) {
+  return String(value || "")
     .split(",")
-    .map((cert) => cert.trim().toLowerCase())
+    .map((item) => item.trim())
     .filter(Boolean);
+}
 
-  const available = (company.certifications || "")
-    .split(",")
-    .map((cert) => cert.trim().toLowerCase());
+function normalize(value) {
+  return String(value || "").trim().toLowerCase();
+}
 
-  const missing = required.filter(
-    (cert) => !available.includes(cert)
-  );
+export function matchTender(company, tender) {
+  const passed = [];
+  const missing = [];
+  const hardFailures = [];
+  const companyCertificates = listValues(
+    company.certificates ?? company.certifications,
+  ).map(normalize);
+  const requiredCertificates = listValues(tender.requiredCerts);
 
-  if (missing.length === 0) {
-    score += 25;
-    reasons.push("Required certifications are available");
+  const locationMatches =
+    normalize(tender.state) === "all india" ||
+    normalize(tender.state) === normalize(company.state);
+  if (locationMatches) {
+    passed.push("Location requirement met");
   } else {
-    gaps.push(`Missing certifications: ${missing.join(", ")}`);
+    hardFailures.push("location");
+    missing.push(`Restricted to ${tender.state}`);
   }
 
-  // MSME benefit information
-  if (tender.emdExempt) {
-    reasons.push("Tender lists an EMD exemption benefit");
+  const turnoverMatches =
+    tender.minTurnoverCr == null ||
+    Number(company.turnoverCr || 0) >= Number(tender.minTurnoverCr);
+  if (turnoverMatches) {
+    passed.push("Turnover requirement met");
+  } else {
+    hardFailures.push("turnover");
+    missing.push(`Missing: turnover of Rs ${tender.minTurnoverCr} Cr`);
+  }
+
+  const missingCertificates = requiredCertificates.filter(
+    (certificate) => !companyCertificates.includes(normalize(certificate)),
+  );
+  if (missingCertificates.length === 0) {
+    passed.push("Certification requirements met");
+  } else {
+    hardFailures.push("certificates");
+    missing.push(...missingCertificates.map((certificate) => `Missing: ${certificate}`));
+  }
+
+  let score = 40;
+  const industry = company.industry ?? company.category;
+  if (normalize(industry) === normalize(tender.category)) {
+    score += 30;
+    passed.push("Industry matches tender category");
+  } else {
+    missing.push(`Industry match: ${tender.category}`);
+  }
+
+  const companyKeywords = listValues(company.keywords).map(normalize);
+  const tenderText = normalize(`${tender.title} ${tender.category}`);
+  const matchingKeywords = companyKeywords.filter((keyword) =>
+    tenderText.includes(keyword),
+  );
+  if (matchingKeywords.length > 0) {
+    score += Math.min(matchingKeywords.length * 10, 20);
+    passed.push(`Keywords matched: ${matchingKeywords.join(", ")}`);
+  }
+
+  if (tender.emdExempt && (company.udyamNo ?? company.udyamNumber)) {
+    score += 10;
+    passed.push("Udyam EMD exemption benefit applies");
+  }
+
+  if (hardFailures.length > 0) {
+    score = Math.max(0, Math.min(50, score) - hardFailures.length * 10);
   }
 
   return {
-    score,
-    reasons,
-    gaps,
+    score: Math.max(0, Math.min(100, score)),
     status:
-      score >= 75
+      hardFailures.length === 0
+        ? "eligible"
+        : hardFailures.length === 1
+          ? "partial"
+          : "not_eligible",
+    passed,
+    missing,
+  };
+}
+
+export function calculateMatch(company, tender) {
+  const result = matchTender(company, tender);
+  return {
+    score: result.score,
+    reasons: result.passed,
+    gaps: result.missing,
+    status:
+      result.status === "eligible"
         ? "Strong Match"
-        : score >= 50
-        ? "Moderate Match"
-        : "Low Match",
+        : result.status === "partial"
+          ? "Moderate Match"
+          : "Low Match",
   };
 }

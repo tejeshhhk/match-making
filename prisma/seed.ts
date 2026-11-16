@@ -4,6 +4,22 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.savedTender.deleteMany();
+  await prisma.tender.deleteMany();
+  await prisma.company.deleteMany();
+
+  await prisma.company.create({
+    data: {
+      name: "Sharma Furniture Works",
+      industry: "Furniture",
+      state: "Punjab",
+      udyamNo: "UDYAM-PB-12-0001234",
+      turnoverCr: 1.2,
+      certificates: "GST,BIS",
+      keywords: "office,desks,steel",
+    },
+  });
+
   await prisma.tender.createMany({
     data: [
       {
@@ -13,7 +29,7 @@ async function main() {
         state: "Punjab",
         valueCr: 0.25,
         minTurnoverCr: 0.5,
-        requiredCerts: "ISO 9001",
+        requiredCerts: "GST",
         emdExempt: true,
         deadline: new Date("2027-03-31"),
         sourceUrl: "https://example.com/tender-001",
@@ -22,10 +38,10 @@ async function main() {
         title: "Installation of Solar Panels on Government Buildings",
         department: "Department of Renewable Energy",
         category: "Electrical",
-        state: "Haryana",
+        state: "All India",
         valueCr: 0.80,
         minTurnoverCr: 1.0,
-        requiredCerts: "ISO 14001",
+        requiredCerts: "BIS,ISO 14001",
         emdExempt: false,
         deadline: new Date("2027-04-15"),
         sourceUrl: "https://example.com/tender-002",

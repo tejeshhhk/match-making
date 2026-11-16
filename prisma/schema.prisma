@@ -10,35 +10,35 @@ datasource db {
 
 // MSME Business Profile
 model Company {
-  id             String        @id @default(cuid())
-  name           String
-  udyamNumber    String        @unique
-  category       String
-  state          String
-  turnoverCr     Float         @default(0)
-  experienceYears Int          @default(0)
-  certifications String        @default("")
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id           String        @id @default(cuid())
+  name         String        @default("")
+  industry     String        @default("")
+  state        String        @default("")
+  udyamNo      String?       @unique
+  turnoverCr   Float         @default(0)
+  certificates String        @default("")
+  keywords     String        @default("")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   savedTenders   SavedTender[]
 }
 
 // Government Tender Information
 model Tender {
-  id              String        @id @default(cuid())
-  title           String
-  department      String
-  category        String
-  state           String
-  valueCr         Float
-  minTurnoverCr   Float
-  requiredCerts   String        @default("")
-  emdExempt       Boolean       @default(false)
-  deadline        DateTime
-  sourceUrl       String
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id            String        @id @default(cuid())
+  title         String
+  department    String
+  category      String
+  state         String
+  valueCr       Float
+  minTurnoverCr Float?
+  requiredCerts String        @default("")
+  emdExempt     Boolean       @default(false)
+  deadline      DateTime
+  sourceUrl     String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   savedTenders    SavedTender[]
 }

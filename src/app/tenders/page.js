@@ -12,10 +12,15 @@ export default async function TendersPage({ searchParams }) {
   const params = await searchParams;
   const filter = typeof params?.filter === "string" ? params.filter : "all";
   const query = typeof params?.q === "string" ? params.q.trim().toLowerCase() : "";
-  const [company, tenders] = await Promise.all([
-    getCurrentCompany(),
+  const company = await getCurrentCompany();
+  const [tenders, savedTenders] = await Promise.all([
     prisma.tender.findMany({ orderBy: { deadline: "asc" } }),
+    prisma.savedTender.findMany({
+      where: { companyId: company.id },
+      select: { tenderId: true },
+    }),
   ]);
+  const savedTenderIds = new Set(savedTenders.map(({ tenderId }) => tenderId));
   const scoredTenders = tenders
     .map((tender) => ({ tender, match: matchTender(company, tender) }))
     .sort((a, b) => b.match.score - a.match.score);
@@ -90,7 +95,15 @@ export default async function TendersPage({ searchParams }) {
 
         {filtered.length ? (
           <div className="grid gap-5 lg:grid-cols-2">
-            {filtered.map(({ tender, match }) => <TenderCard key={tender.id} tender={tender} match={match} closingSoon={closingSoon(tender)} />)}
+            {filtered.map(({ tender, match }) => (
+              <TenderCard
+                key={tender.id}
+                tender={tender}
+                match={match}
+                closingSoon={closingSoon(tender)}
+                initiallySaved={savedTenderIds.has(tender.id)}
+              />
+            ))}
           </div>
         ) : (
           <div className="card py-14 text-center text-slate-600">No tenders match these filters.</div>

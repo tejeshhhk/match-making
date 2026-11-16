@@ -1,6 +1,7 @@
 import Link from "next/link";
+import SaveTenderButton from "@/components/SaveTenderButton";
 
-export default function TenderCard({ tender, match, closingSoon }) {
+export default function TenderCard({ tender, match, closingSoon, initiallySaved = false }) {
   const statusLabel = {
     eligible: "Eligible",
     partial: "One gap away",
@@ -47,7 +48,7 @@ export default function TenderCard({ tender, match, closingSoon }) {
 
       <div className="mt-auto flex flex-wrap gap-3 border-t border-slate-100 pt-4">
         <Link href={`/tenders/${tender.id}`} className="secondary-button">View details</Link>
-        <button type="button" disabled className="secondary-button cursor-not-allowed opacity-50">Save</button>
+        <SaveTenderButton tenderId={tender.id} initiallySaved={initiallySaved} />
       </div>
     </article>
   );

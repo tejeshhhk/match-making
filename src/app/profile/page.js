@@ -5,7 +5,26 @@ import { getProfileStrength } from "@/lib/profile";
 
 export const instant = false;
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ searchParams }) {
+  const params = await searchParams;
+  if (params?.company === "missing") {
+    return (
+      <main className="page-shell">
+        <div className="mx-auto max-w-3xl">
+          <section className="card" role="alert">
+            <p className="eyebrow">ACCOUNT SETUP</p>
+            <h1 className="page-title mt-2">Company profile unavailable</h1>
+            <p className="mt-3 text-slate-600">
+              Your account is not linked to a company. Log out and sign up again,
+              or contact support if this account previously existed.
+            </p>
+            <Link href="/login" className="primary-button mt-5 inline-flex">Return to login</Link>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   const company = await getCurrentCompany();
   const strength = getProfileStrength(company);
 

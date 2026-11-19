@@ -16,14 +16,13 @@ export async function toggleSaveTender(tenderId) {
     return { ok: false, saved: false, message: "That tender could not be saved." };
   }
 
+  const company = await getCurrentCompany();
+
   try {
-    const [company, tender] = await Promise.all([
-      getCurrentCompany(),
-      prisma.tender.findUnique({
-        where: { id: validTenderId },
-        select: { id: true },
-      }),
-    ]);
+    const tender = await prisma.tender.findUnique({
+      where: { id: validTenderId },
+      select: { id: true },
+    });
 
     if (!tender) {
       return { ok: false, saved: false, message: "That tender could not be found." };

@@ -30,8 +30,9 @@ export async function saveAlertSettings(previousState, formData) {
     };
   }
 
+  const company = await getCurrentCompany();
+
   try {
-    const company = await getCurrentCompany();
     await prisma.alertSetting.upsert({
       where: { companyId: company.id },
       update: result.data,

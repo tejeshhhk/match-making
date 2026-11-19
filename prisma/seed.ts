@@ -1,14 +1,22 @@
 
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const demoPassword = process.env.DEMO_PASSWORD;
+  if (!demoPassword) {
+    throw new Error("DEMO_PASSWORD is required to seed the demo account.");
+  }
+
   await prisma.savedTender.deleteMany();
+  await prisma.alertSetting.deleteMany();
+  await prisma.user.deleteMany();
   await prisma.tender.deleteMany();
   await prisma.company.deleteMany();
 
-  await prisma.company.create({
+  const company = await prisma.company.create({
     data: {
       name: "Sharma Furniture Works",
       industry: "Furniture",
@@ -17,6 +25,15 @@ async function main() {
       turnoverCr: 1.2,
       certificates: "GST,BIS",
       keywords: "office,desks,steel",
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      name: "Demo MSME",
+      email: "demo@tendermatch.in",
+      passwordHash: await bcrypt.hash(demoPassword, 12),
+      companyId: company.id,
     },
   });
 

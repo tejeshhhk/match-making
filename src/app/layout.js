@@ -1,10 +1,16 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import "./globals.css";
+import NavigationAuth from "@/components/NavigationAuth";
 
 export const metadata = {
   title: "TenderMatch",
   description: "Find government tenders matched to your business capabilities.",
 };
+
+function NavigationFallback() {
+  return <div className="min-h-11 w-40" aria-hidden="true" />;
+}
 
 export default function RootLayout({ children }) {
   return (
@@ -15,12 +21,9 @@ export default function RootLayout({ children }) {
             <Link href="/tenders" className="text-xl font-bold tracking-tight text-[#2B39B8]">
               TenderMatch
             </Link>
-            <div className="flex items-center gap-1 overflow-x-auto text-sm font-medium text-slate-600">
-              <Link className="nav-link" href="/tenders">Matched tenders</Link>
-              <Link className="nav-link" href="/saved">Saved</Link>
-              <Link className="nav-link" href="/alerts">Alerts</Link>
-              <Link className="nav-link" href="/profile">Company profile</Link>
-            </div>
+            <Suspense fallback={<NavigationFallback />}>
+              <NavigationAuth />
+            </Suspense>
           </nav>
         </header>
         {children}

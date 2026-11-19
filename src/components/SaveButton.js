@@ -2,11 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { removeSavedTender, saveTender } from "@/app/saved/actions";
+import { toggleSaveTender } from "@/app/tenders/actions";
 
-export default function SaveTenderButton({ tenderId, initiallySaved = false }) {
+export default function SaveButton({ tenderId, initialSaved = false, savedLabel = "Saved" }) {
   const router = useRouter();
-  const [saved, setSaved] = useState(initiallySaved);
+  const [saved, setSaved] = useState(initialSaved);
   const [message, setMessage] = useState("");
   const [hasError, setHasError] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -15,9 +15,7 @@ export default function SaveTenderButton({ tenderId, initiallySaved = false }) {
     setMessage("");
     setHasError(false);
     startTransition(async () => {
-      const result = saved
-        ? await removeSavedTender(tenderId)
-        : await saveTender(tenderId);
+      const result = await toggleSaveTender(tenderId);
 
       if (result.ok) {
         setSaved(result.saved);
@@ -39,7 +37,7 @@ export default function SaveTenderButton({ tenderId, initiallySaved = false }) {
         aria-pressed={saved}
         className={`secondary-button ${isPending ? "cursor-wait opacity-60" : ""}`}
       >
-        {isPending ? (saved ? "Removing..." : "Saving...") : saved ? "Saved" : "Save"}
+        {isPending ? "Updating..." : saved ? `✓ ${savedLabel}` : "Save"}
       </button>
       {message && (
         <p

@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TenderMatch
 
-## Getting Started
+TenderMatch is a tender discovery application built for Indian MSMEs. It helps
+business owners find government opportunities, understand their eligibility,
+identify missing requirements, and save relevant tenders.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Company profile for industry, location, turnover, Udyam number, certificates,
+  and business capabilities
+- Tender search and filters
+- Hard eligibility checks and tender match scoring
+- Partial-match and gap analysis
+- Udyam-based EMD exemption detection
+- Saved tenders
+- Alert preferences
+- Daily tender collection and notification cron routes
+
+## Tech stack
+
+- Next.js 16
+- React 19
+- Prisma
+- PostgreSQL
+- Zod
+- Tailwind CSS
+- Vitest
+
+## Local setup
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Copy [`.env.example`](.env.example) to `.env` and provide the required
+   environment variable names with local values.
+
+3. Run database migrations:
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. Seed the database:
+
+   ```bash
+   npx prisma db seed
+   ```
+
+5. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+Then open `http://localhost:3000`.
+
+## How matching works
+
+| Type | Checks |
+| --- | --- |
+| Hard checks | Tender location, minimum turnover, and required certificates |
+| Soft score | Industry relevance, matching capabilities, and Udyam EMD exemption |
+
+A tender is **eligible** when every hard check passes. One failed hard check
+produces a **partial** match, while multiple failures produce a
+**not eligible** result.
+
+## Live deployment
+
+https://match-making-8td4.vercel.app/
+
+## Cron protection
+
+The `/api/cron/collect` and `/api/cron/notify` routes require
+`CRON_SECRET`. Set `CRON_SECRET` in the environment and send it as:
+
+```text
+Authorization: Bearer <CRON_SECRET>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Roadmap
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Real tender ingestion from authorized government sources
+- Email delivery for matching tenders and deadline reminders
+- Authentication and individual company accounts

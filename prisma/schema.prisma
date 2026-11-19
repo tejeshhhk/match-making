@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,37 +9,38 @@ datasource db {
 
 // MSME Business Profile
 model Company {
-  id           String        @id @default(cuid())
-  name         String        @default("")
-  industry     String        @default("")
-  state        String        @default("")
-  udyamNo      String?       @unique
-  turnoverCr   Float         @default(0)
-  certificates String        @default("")
-  keywords     String        @default("")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id           String   @id @default(cuid())
+  name         String   @default("")
+  industry     String   @default("")
+  state        String   @default("")
+  udyamNo      String?  @unique
+  turnoverCr   Float    @default(0)
+  certificates String   @default("")
+  keywords     String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  savedTenders   SavedTender[]
+  savedTenders SavedTender[]
+  alertSetting AlertSetting?
 }
 
 // Government Tender Information
 model Tender {
-  id            String        @id @default(cuid())
+  id            String   @id @default(cuid())
   title         String
   department    String
   category      String
   state         String
   valueCr       Float
   minTurnoverCr Float?
-  requiredCerts String        @default("")
-  emdExempt     Boolean       @default(false)
+  requiredCerts String   @default("")
+  emdExempt     Boolean  @default(false)
   deadline      DateTime
-  sourceUrl     String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  sourceUrl     String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  savedTenders    SavedTender[]
+  savedTenders SavedTender[]
 }
 
 // Bookmarked Tenders
@@ -50,8 +50,22 @@ model SavedTender {
   tenderId  String
   createdAt DateTime @default(now())
 
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tender    Tender   @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tender  Tender  @relation(fields: [tenderId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, tenderId])
+}
+
+// Alert preferences for the demo company
+model AlertSetting {
+  id                String   @id @default(cuid())
+  companyId         String   @unique
+  newMatches        Boolean  @default(true)
+  deadlineReminders Boolean  @default(true)
+  weeklySummary     Boolean  @default(false)
+  email             String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

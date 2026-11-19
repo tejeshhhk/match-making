@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Supply of Solar Street Lighting Systems",
+    "department": "Department of Rural Development",
+    "category": "Electrical",
+    "state": "Rajasthan",
+    "valueCr": 0.65,
+    "minTurnoverCr": 1,
+    "requiredCerts": "GST,BIS",
+    "emdExempt": false,
+    "deadline": "2026-11-18T17:00:00.000Z",
+    "sourceUrl": "https://example.com/collector/tender-001"
+  },
+  {
+    "title": "Office Furniture for District Administration",
+    "department": "Department of General Administration",
+    "category": "Furniture",
+    "state": "Punjab",
+    "valueCr": 0.42,
+    "minTurnoverCr": 0.75,
+    "requiredCerts": "GST",
+    "emdExempt": true,
+    "deadline": "2026-11-20T17:00:00.000Z",
+    "sourceUrl": "https://example.com/collector/tender-002"
+  },
+  {
+    "title": "Maintenance of Government School Computer Labs",
+    "department": "Department of Education",
+    "category": "IT Hardware",
+    "state": "All India",
+    "valueCr": 1.15,
+    "minTurnoverCr": 2,
+    "requiredCerts": "GST,ISO 9001",
+    "emdExempt": false,
+    "deadline": "2026-11-24T17:00:00.000Z",
+    "sourceUrl": "https://example.com/collector/tender-003"
+  },
+  {
+    "title": "Supply of Protective Workwear",
+    "department": "State Disaster Management Authority",
+    "category": "Textiles",
+    "state": "Maharashtra",
+    "valueCr": 0.38,
+    "minTurnoverCr": 0.5,
+    "requiredCerts": "GST,ISO 9001",
+    "emdExempt": true,
+    "deadline": "2026-12-02T17:00:00.000Z",
+    "sourceUrl": "https://example.com/collector/tender-004"
+  },
+  {
+    "title": "Water Quality Testing Equipment",
+    "department": "Department of Public Health Engineering",
+    "category": "Healthcare",
+    "state": "All India",
+    "valueCr": 0.92,
+    "minTurnoverCr": 1.5,
+    "requiredCerts": "BIS,ISO 14001",
+    "emdExempt": false,
+    "deadline": "2026-12-10T17:00:00.000Z",
+    "sourceUrl": "https://example.com/collector/tender-005"
+  }
+]

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import SaveTenderButton from "@/components/SaveTenderButton";
+import SaveButton from "@/components/SaveButton";
 
 export default function TenderCard({ tender, match, closingSoon, initiallySaved = false }) {
   const statusLabel = {
@@ -48,7 +48,7 @@ export default function TenderCard({ tender, match, closingSoon, initiallySaved 
 
       <div className="mt-auto flex flex-wrap gap-3 border-t border-slate-100 pt-4">
         <Link href={`/tenders/${tender.id}`} className="secondary-button">View details</Link>
-        <SaveTenderButton tenderId={tender.id} initiallySaved={initiallySaved} />
+        <SaveButton tenderId={tender.id} initialSaved={initiallySaved} />
       </div>
     </article>
   );

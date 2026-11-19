@@ -1,0 +1,4 @@
+-- Add timestamps to existing alert settings.
+ALTER TABLE "AlertSetting"
+ADD COLUMN "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

@@ -79,7 +79,6 @@ environment before redeploying:
 
 ```text
 DATABASE_URL=<your production PostgreSQL connection string>
-DIRECT_URL=<your direct PostgreSQL connection string>
 AUTH_SECRET=<a long random secret>
 DEMO_PASSWORD=<password for the optional demo account>
 CRON_SECRET=<a long random secret>
@@ -87,7 +86,6 @@ CRON_SECRET=<a long random secret>
 
 `AUTH_SECRET` is required by Auth.js in production. `DATABASE_URL` must point
 to the PostgreSQL database that contains the applied Prisma migrations.
-`DIRECT_URL` is used for direct database tooling and migrations where supported.
 `DEMO_PASSWORD` is only needed when seeding or re-seeding the demo account.
 `CRON_SECRET` protects both scheduled cron endpoints. The `vercel-build` script
 runs `prisma migrate deploy` before building the app.

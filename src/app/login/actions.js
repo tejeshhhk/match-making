@@ -3,6 +3,17 @@
 import { AuthError } from "next-auth";
 import { signIn } from "@/lib/auth";
 import { loginSchema } from "@/lib/auth-validation";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import {
+  checkLoginRateLimit,
+  getTrustedClientIp,
+  normalizeLoginEmail,
+} from "@/lib/login-rate-limit";
+
+function getClientIp(requestHeaders) {
+  return getTrustedClientIp(requestHeaders);
+}
 
 export async function validateCallbackUrl(callbackUrl) {
   if (typeof callbackUrl !== "string" || callbackUrl.length === 0) {
@@ -19,6 +30,19 @@ export async function validateCallbackUrl(callbackUrl) {
   }
 
   try {
+    let decoded = callbackUrl;
+    for (let index = 0; index < 3; index += 1) {
+      const nextDecoded = decodeURIComponent(decoded);
+      if (nextDecoded === decoded) break;
+      decoded = nextDecoded;
+    }
+    if (
+      decoded.startsWith("//") ||
+      decoded.includes("\\") ||
+      /[\u0000-\u0020\u007f]/.test(decoded)
+    ) {
+      return "/tenders";
+    }
     const origin = "http://tendermatch.local";
     const parsed = new URL(callbackUrl, origin);
     if (parsed.origin !== origin) {
@@ -56,18 +80,41 @@ export async function login(previousState, formData) {
     };
   }
 
+  const email = normalizeLoginEmail(result.data.email);
+  const requestHeaders = await headers();
+  const ip = getClientIp(requestHeaders);
+  let rateLimit;
+  try {
+    rateLimit = await checkLoginRateLimit({ email, ip });
+  } catch {
+    return {
+      values,
+      errors: {},
+      message: "Unable to sign in right now. Please try again.",
+    };
+  }
+  if (rateLimit.blocked) {
+    return {
+      values,
+      errors: {},
+      message: "Too many login attempts. Please wait and try again.",
+    };
+  }
+
   try {
     await signIn("credentials", {
-      email: result.data.email,
+      email,
       password: result.data.password,
       redirectTo: callbackUrl,
+      redirect: false,
     });
+    redirect(callbackUrl);
   } catch (error) {
     if (error instanceof AuthError) {
       return {
         values,
         errors: {},
-        message: "Email or password is incorrect.",
+        message: "Invalid email or password.",
       };
     }
     throw error;

@@ -61,12 +61,10 @@ export async function signup(previousState, formData) {
           name: values.name,
           email: values.email,
         },
-        errors: { email: "An account with this email already exists." },
-        message: "",
+        errors: {},
+        message: "We could not create the account. Check your details and try again.",
       };
     }
-
-    console.error("Signup failed.", error);
 
     return {
       values: {
@@ -82,7 +80,8 @@ export async function signup(previousState, formData) {
     await signIn("credentials", {
       email: result.data.email,
       password: result.data.password,
-      redirectTo: "/tenders",
+      redirectTo: "/profile",
+      redirect: false,
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -99,5 +98,5 @@ export async function signup(previousState, formData) {
     throw error;
   }
 
-  redirect("/tenders");
+  redirect("/profile");
 }

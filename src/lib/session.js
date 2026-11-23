@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 
 export async function getCurrentCompany() {
+  await connection();
+
   let session;
   try {
     session = await auth();

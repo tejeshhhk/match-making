@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentCompany } from "@/lib/session";
+import { assertCompanyOwnership } from "@/lib/ownership";
 
 function validateTenderId(tenderId) {
   return typeof tenderId === "string" && tenderId.trim().length > 0 && tenderId.length <= 100
@@ -35,10 +36,11 @@ export async function toggleSaveTender(tenderId) {
           tenderId: tender.id,
         },
       },
-      select: { id: true },
+      select: { id: true, companyId: true },
     });
 
     if (savedTender) {
+      assertCompanyOwnership(company.id, savedTender.companyId);
       await prisma.savedTender.delete({ where: { id: savedTender.id } });
     } else {
       await prisma.savedTender.create({

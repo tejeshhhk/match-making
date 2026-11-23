@@ -1,4 +1,7 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
+import { auth } from "@/lib/auth";
 
 export const metadata = {
   title: "TenderMatch | Government tenders for Indian MSMEs",
@@ -39,12 +42,14 @@ export default function HomePage() {
             every tender decision clearer.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href="/profile" className="primary-button">
-              Create your profile
-            </Link>
-            <Link href="/tenders" className="secondary-button">
-              See matched tenders
-            </Link>
+            <Suspense fallback={
+              <>
+                <Link href="/signup" className="primary-button">Create your profile</Link>
+                <Link href="/login" className="secondary-button">Log in</Link>
+              </>
+            }>
+              <LandingAuthActions />
+            </Suspense>
           </div>
         </section>
 
@@ -80,5 +85,25 @@ export default function HomePage() {
         </section>
       </div>
     </main>
+  );
+}
+
+async function LandingAuthActions() {
+  await connection();
+  const session = await auth();
+
+  if (session?.user) {
+    return (
+      <Link href="/tenders" className="primary-button">
+        Go to matched tenders
+      </Link>
+    );
+  }
+
+  return (
+    <>
+      <Link href="/signup" className="primary-button">Create your profile</Link>
+      <Link href="/login" className="secondary-button">Log in</Link>
+    </>
   );
 }

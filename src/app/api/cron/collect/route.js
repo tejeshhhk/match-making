@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isCronAuthorized } from "@/lib/cron";
 import { prisma } from "@/lib/prisma";
+import { cleanupExpiredLoginAttempts } from "@/lib/login-rate-limit";
 
 const tenderSchema = z.object({
   title: z.string().min(1),
@@ -21,6 +22,12 @@ const tenderSchema = z.object({
 export async function GET(request) {
   if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    await cleanupExpiredLoginAttempts({ limit: 500 });
+  } catch (error) {
+    console.error("Login attempt cleanup failed.", error?.code || "unknown");
   }
 
   try {

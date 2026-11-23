@@ -5,7 +5,7 @@ import CertificateChips from "@/components/CertificateChips";
 import { saveProfile } from "@/app/profile/actions";
 import { INDIAN_STATES, INDUSTRIES } from "@/lib/constants";
 
-const initialState = { errors: {}, values: {} };
+const initialState = { errors: {}, values: {}, message: "" };
 
 export default function ProfileForm({ company }) {
   const [state, formAction, isPending] = useActionState(saveProfile, initialState);
@@ -66,6 +66,11 @@ export default function ProfileForm({ company }) {
       <button type="submit" disabled={isPending} className="primary-button">
         {isPending ? "Saving..." : "Save profile"}
       </button>
+      {state.message && (
+        <p aria-live="polite" className="text-sm font-semibold text-red-700">
+          {state.message}
+        </p>
+      )}
     </form>
   );
 }

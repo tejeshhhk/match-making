@@ -31,4 +31,16 @@ describe("profileSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("normalizes a blank Udyam number to null for the unique database field", () => {
+    const result = profileSchema.safeParse({
+      ...validProfile,
+      udyamNo: "   ",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.udyamNo).toBeNull();
+    }
+  });
 });

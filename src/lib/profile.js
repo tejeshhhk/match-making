@@ -4,7 +4,11 @@ export const profileSchema = z.object({
   name: z.string().trim().min(2, "Enter your company name."),
   industry: z.string().trim().min(1, "Choose an industry."),
   state: z.string().trim().min(1, "Choose your state."),
-  udyamNo: z.string().trim().max(50, "Udyam number is too long."),
+  udyamNo: z
+    .string()
+    .trim()
+    .max(50, "Udyam number is too long.")
+    .transform((udyamNo) => udyamNo || null),
   turnoverCr: z.coerce
     .number({ message: "Enter turnover in rupees crore." })
     .finite("Enter a valid turnover.")
